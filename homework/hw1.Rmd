@@ -87,6 +87,7 @@ log_likelihood <- function(beta, sigma2, X, y) {
 n <- nrow(X)
 rss <- sum(residuals^2)
 sigma2_mle <- rss / n
+sigma2_unbiased <- rss / (n - ncol(X))
 
 loglik_matrix <- log_likelihood(
   beta = beta_hat,
@@ -130,6 +131,17 @@ $$
 The plot is plotted as:
 
 ```{r}
+direction <- c(0, 0, 1, 0, 0, 0)
+t_grid <- seq(-1.25, 1.25, length.out = 251)
+profile <- vapply(t_grid, function(t) {
+  log_likelihood(
+    beta = beta_hat + t * direction,
+    sigma2 = sigma2_mle,
+    X = X,
+    y = y
+  )
+}, numeric(1))
+
 plot(
   t_grid,
   profile,
